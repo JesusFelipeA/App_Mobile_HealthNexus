@@ -1,0 +1,157 @@
+import React, { useState } from 'react';
+import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+export const colors = { text: '#0E2430', sub: '#5D7480', faint: '#8DA0A9', teal: '#0E7C74', tealDeep: '#0A5C57', mint: '#E4F3EF', coral: '#DD5B47', coralTint: '#FBE7E2', amber: '#C98A2C', amberTint: '#FAEDDA', line: '#E3EAEA', bg: '#F5F8F8', green: '#16A34A', red: '#DC2626' };
+
+export const shadow = { shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 };
+
+export const Ico = ({ name, size = 20, color = colors.text, style }) => <Icon name={name} size={size} color={color} style={style} />;
+
+// Pantalla con encabezado (botón volver + título) y contenido con scroll
+export function Screen({ title, icon, iconColor = colors.teal, children }) {
+  const nav = useNavigation();
+  return (
+    <SafeAreaView style={s.screen} edges={['top']}>
+      <View style={s.header}>
+        <Pressable onPress={() => nav.goBack()} hitSlop={12} style={s.back} accessibilityLabel="Volver">
+          <Ico name="chevron-back" size={24} />
+        </Pressable>
+        {icon ? <Ico name={icon} size={22} color={iconColor} /> : null}
+        <Text style={s.headerTitle}>{title}</Text>
+      </View>
+      <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">{children}</ScrollView>
+    </SafeAreaView>
+  );
+}
+
+export const Card = ({ children, accent, style }) => (
+  <View style={[s.card, accent ? { borderLeftWidth: 6, borderLeftColor: accent } : null, style]}>{children}</View>
+);
+
+export const Badge = ({ text, color, bg }) => (
+  <View style={[s.badge, { backgroundColor: bg || `${color}26` }]}><Text style={[s.badgeText, { color }]}>{text}</Text></View>
+);
+
+export const SectionTitle = ({ children }) => <Text style={s.sectionTitle}>{children}</Text>;
+
+export const Empty = ({ icon = 'folder-open-outline', text }) => (
+  <View style={{ alignItems: 'center', marginTop: 50 }}>
+    <Ico name={icon} size={60} color={colors.line} />
+    <Text style={{ marginTop: 16, fontWeight: '600', color: colors.sub, textAlign: 'center' }}>{text}</Text>
+  </View>
+);
+
+export const Loading = ({ text = 'Cargando...' }) => (
+  <View style={{ alignItems: 'center', padding: 40 }}>
+    <ActivityIndicator color={colors.teal} />
+    <Text style={{ marginTop: 10, color: colors.sub, fontWeight: '600' }}>{text}</Text>
+  </View>
+);
+
+export function ErrorBox({ message, onRetry }) {
+  if (!message) return null;
+  return (
+    <View style={s.errorBox}>
+      <Ico name="alert-circle-outline" size={18} color={colors.coral} />
+      <Text style={{ flex: 1, color: colors.coral, fontWeight: '600', fontSize: 13 }}>{message}</Text>
+      {onRetry ? <Pressable onPress={() => onRetry()}><Text style={{ color: colors.coral, fontWeight: '800' }}>Reintentar</Text></Pressable> : null}
+    </View>
+  );
+}
+
+// Campo de texto con etiqueta
+export function Field({ label, icon, style, multiline, ...props }) {
+  return (
+    <View style={{ marginBottom: 16 }}>
+      {label ? (
+        <View style={s.labelRow}>
+          {icon ? <Ico name={icon} size={16} color={colors.sub} /> : null}
+          <Text style={s.label}>{label}</Text>
+        </View>
+      ) : null}
+      <TextInput
+        placeholderTextColor={colors.faint}
+        multiline={multiline}
+        style={[s.input, multiline ? { height: 100, paddingTop: 14, textAlignVertical: 'top' } : null, style]}
+        {...props}
+      />
+    </View>
+  );
+}
+
+// Lista desplegable (reemplaza al <select> de la web)
+export function SelectField({ label, icon, value, options, onChange, placeholder = 'Selecciona...' }) {
+  const [open, setOpen] = useState(false);
+  const selected = options.find((o) => String(o.value) === String(value));
+  return (
+    <View style={{ marginBottom: 16 }}>
+      {label ? (
+        <View style={s.labelRow}>
+          {icon ? <Ico name={icon} size={16} color={colors.sub} /> : null}
+          <Text style={s.label}>{label}</Text>
+        </View>
+      ) : null}
+      <Pressable onPress={() => setOpen(true)} style={[s.input, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+        <Text style={{ color: selected ? colors.text : colors.faint, fontSize: 15, flex: 1 }} numberOfLines={1}>{selected ? selected.label : placeholder}</Text>
+        <Ico name="chevron-down" size={18} color={colors.sub} />
+      </Pressable>
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <Pressable style={s.overlay} onPress={() => setOpen(false)}>
+          <View style={s.sheet}>
+            <FlatList
+              data={options}
+              keyExtractor={(o) => String(o.value)}
+              ListEmptyComponent={<Text style={{ padding: 20, textAlign: 'center', color: colors.sub }}>No hay opciones disponibles.</Text>}
+              renderItem={({ item }) => (
+                <Pressable onPress={() => { onChange(String(item.value)); setOpen(false); }} style={s.option}>
+                  <Text style={{ color: colors.text, fontSize: 15, fontWeight: String(item.value) === String(value) ? '800' : '500' }}>{item.label}</Text>
+                </Pressable>
+              )}
+            />
+          </View>
+        </Pressable>
+      </Modal>
+    </View>
+  );
+}
+
+// variant: 'primary' | 'outline' | 'soft'
+export function Button({ title, icon, onPress, variant = 'primary', color = colors.teal, disabled, loading, style }) {
+  const base = variant === 'primary' ? s.btnPrimary : variant === 'outline' ? [s.btnOutline, { borderColor: color }] : s.btnSoft;
+  const textColor = variant === 'primary' ? '#fff' : variant === 'outline' ? color : colors.tealDeep;
+  return (
+    <Pressable onPress={onPress} disabled={disabled || loading} style={[base, (disabled || loading) && { opacity: 0.6 }, style]}>
+      {loading ? <ActivityIndicator color={textColor} /> : (
+        <>
+          {icon ? <Ico name={icon} size={variant === 'soft' ? 18 : 20} color={textColor} /> : null}
+          <Text style={{ color: textColor, fontWeight: '700', fontSize: variant === 'soft' ? 14 : 16 }}>{title}</Text>
+        </>
+      )}
+    </Pressable>
+  );
+}
+
+const s = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.bg },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: colors.line },
+  back: { padding: 6, marginRight: 4 },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: colors.text, flexShrink: 1 },
+  content: { padding: 24, paddingBottom: 120 },
+  card: { backgroundColor: '#fff', borderRadius: 20, padding: 20, marginBottom: 16, ...shadow },
+  badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+  badgeText: { fontSize: 11, fontWeight: '700' },
+  sectionTitle: { marginBottom: 16, fontSize: 14, fontWeight: '700', color: colors.sub, textTransform: 'uppercase', letterSpacing: 1 },
+  errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.coralTint, borderRadius: 14, padding: 14, marginBottom: 16 },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  label: { fontSize: 13, fontWeight: '600', color: colors.sub },
+  input: { minHeight: 50, borderWidth: 1, borderColor: colors.line, borderRadius: 12, paddingHorizontal: 15, fontSize: 15, backgroundColor: '#fff', color: colors.text },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 },
+  sheet: { backgroundColor: '#fff', borderRadius: 20, maxHeight: '70%', overflow: 'hidden' },
+  option: { paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: colors.line },
+  btnPrimary: { height: 55, borderRadius: 16, backgroundColor: colors.teal, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, elevation: 4 },
+  btnOutline: { height: 55, borderRadius: 16, borderWidth: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  btnSoft: { marginTop: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: colors.bg, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+});
