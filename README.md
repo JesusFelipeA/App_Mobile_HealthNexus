@@ -41,19 +41,24 @@ src/
 ├── utils/triage.js         # niveles de triage, estados, formatos
 ├── components/ui.js        # Screen, Card, Field, SelectField, Button...
 ├── components/EmergencyButton.js
-└── screens/                # Login, Dashboard, Triage, Patients, Internas,
-                            # Externas, Hospitals, Seguimiento, Auditoria
+└── screens/                # Login, Dashboard, Triage, Patients, Internas, Externas, Hospitals,
+                            # Seguimiento, Auditoria, SignosVitales, Medicacion,
+                            # Medicamentos, Existencias, Movimientos, AlertasFarmacia
 ```
 
 ## Qué ve cada rol
 | Pantalla | Roles |
 |---|---|
-| Triage, Pacientes, Derivaciones internas | médico, enfermería |
-| Derivaciones externas | médico |
-| Hospitales, Seguimiento | todos (reservar cama: solo médico) |
+| Triage, Pacientes, Derivaciones internas, Hospitales, Seguimiento | médico, enfermería |
+| Derivaciones externas | médico (reservar cama en Hospitales: solo médico) |
+| Signos vitales, Medicación | enfermería registra · médico solo consulta |
+| Existencias por lote | farmacia, enfermería, médico (solo lectura, excepto farmacia) |
+| Movimientos de inventario | farmacia registra · enfermería solo consulta |
+| Medicamentos, Alertas de inventario | farmacia |
 | Auditoría | solo administrador |
 
-El administrador ve todo. La API vuelve a validar los permisos en el servidor.
+El administrador ve todo. La API vuelve a validar los permisos en el servidor (los permisos coinciden con los de tu tabla `permissions`).
+Para probar enfermería y farmacia crea usuarios con `scripts/crear-usuario.js` (ver README de la API).
 
 ## Librerías nativas usadas
 `@react-navigation/native` + `native-stack`, `react-native-screens`, `react-native-safe-area-context`,
@@ -65,4 +70,5 @@ El administrador ve todo. La API vuelve a validar los permisos en el servidor.
 
 ## Pendiente
 - Notificaciones push (Firebase) y escaneo de paciente con la cámara.
+- Dispensación de recetas (farmacia) y descuento de inventario al administrar medicación.
 - Solo está configurado Android; la carpeta `ios/` es la del proyecto base y no se probó.

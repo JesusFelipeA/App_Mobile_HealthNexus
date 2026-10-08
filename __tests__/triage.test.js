@@ -16,3 +16,9 @@ describe('utils/triage', () => {
     expect(statusLabel('en_espera')).toBe('En espera');
   });
 });
+
+import { fmtDate } from '../src/utils/triage';
+test('fmtDate', () => {
+  expect(fmtDate('2026-10-06')).toBe('06/10/2026');
+  expect(fmtDate(null)).toBe('');
+});

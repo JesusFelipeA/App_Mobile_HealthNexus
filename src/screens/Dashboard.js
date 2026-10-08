@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getStats } from '../api';
+import { getFarmaciaResumen, getStats } from '../api';
 import { useAuth } from '../context/AuthContext';
 import useFetch from '../hooks/useFetch';
 import { Ico, ErrorBox, colors, shadow } from '../components/ui';
@@ -10,10 +10,16 @@ import { Ico, ErrorBox, colors, shadow } from '../components/ui';
 const MODULES = [
   { id: 'Triage', title: 'Triage', icon: 'medkit-outline', accent: 'teal', tag: 'Acceso rápido', desc: 'Clasificación de pacientes', roles: ['medico', 'enfermeria'] },
   { id: 'Patients', title: 'Pacientes', icon: 'people-outline', accent: 'teal', tag: 'Registrados', desc: 'Lista y prioridad', roles: ['medico', 'enfermeria'] },
+  { id: 'SignosVitales', title: 'Signos vitales', icon: 'pulse-outline', accent: 'coral', tag: 'Enfermería', desc: 'Toma y registro', roles: ['enfermeria', 'medico'] },
+  { id: 'Medicacion', title: 'Medicación', icon: 'medkit-outline', accent: 'teal', tag: 'Enfermería', desc: 'Administración a pacientes', roles: ['enfermeria', 'medico'] },
   { id: 'Internas', title: 'Derivaciones internas', icon: 'swap-horizontal-outline', accent: 'teal', tag: 'Gestión eficiente', desc: 'Traslados entre áreas', roles: ['medico', 'enfermeria'] },
   { id: 'Externas', title: 'Derivaciones externas', icon: 'globe-outline', accent: 'coral', tag: 'Conectando', desc: 'Traslados y referencias', roles: ['medico'] },
-  { id: 'Hospitals', title: 'Hospitales', icon: 'location-outline', accent: 'coral', tag: 'Más opciones', desc: 'Cercanos y camas' },
-  { id: 'Seguimiento', title: 'Seguimiento', icon: 'analytics-outline', accent: 'amber', tag: 'Tiempo real', desc: 'Estado de pacientes' },
+  { id: 'Hospitals', title: 'Hospitales', icon: 'location-outline', accent: 'coral', tag: 'Más opciones', desc: 'Cercanos y camas', roles: ['medico', 'enfermeria'] },
+  { id: 'Seguimiento', title: 'Seguimiento', icon: 'analytics-outline', accent: 'amber', tag: 'Tiempo real', desc: 'Estado de pacientes', roles: ['medico', 'enfermeria'] },
+  { id: 'Medicamentos', title: 'Medicamentos', icon: 'medical-outline', accent: 'teal', tag: 'Farmacia', desc: 'Catálogo y stock', roles: ['farmacia'] },
+  { id: 'Existencias', title: 'Existencias', icon: 'cube-outline', accent: 'teal', tag: 'Por lote', desc: 'Lotes y caducidad', roles: ['farmacia', 'enfermeria', 'medico'] },
+  { id: 'Movimientos', title: 'Movimientos', icon: 'swap-vertical-outline', accent: 'amber', tag: 'Inventario', desc: 'Entradas, salidas y ajustes', roles: ['farmacia', 'enfermeria'] },
+  { id: 'AlertasFarmacia', title: 'Alertas', icon: 'warning-outline', accent: 'coral', tag: 'Farmacia', desc: 'Stock y caducidad', roles: ['farmacia'] },
   { id: 'Auditoria', title: 'Auditoría', icon: 'clipboard-outline', accent: 'amber', tag: 'Transparencia', desc: 'Bitácora del sistema', roles: [] },
 ];
 const ACCENT = { teal: [colors.teal, colors.mint], coral: [colors.coral, colors.coralTint], amber: [colors.amber, colors.amberTint] };
@@ -21,8 +27,10 @@ const ROL = { administrador: 'Administrador', medico: 'Médico', enfermeria: 'En
 
 export default function Dashboard({ navigation }) {
   const { user, can, logout } = useAuth();
-  const { data, error, reload } = useFetch(getStats, []);
+  const isFarmacia = user.rol === 'farmacia';
+  const { data, error, reload } = useFetch(() => (isFarmacia ? getFarmaciaResumen() : getStats()), []);
   const stats = data || { totalPatients: 0, redCount: 0, yellowCount: 0, greenCount: 0 };
+  const farm = data || { totalMedicamentos: 0, stockBajo: 0, sinStock: 0, lotesPorCaducar: 0, lotesCaducados: 0 };
   const visible = MODULES.filter((m) => !m.roles || can(...m.roles));
   const date = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -31,7 +39,11 @@ export default function Dashboard({ navigation }) {
     { text: 'Cerrar sesión', onPress: logout },
   ]);
 
-  const rows = [
+  const rows = isFarmacia ? [
+    { icon: 'medical', label: 'Medicamentos activos', value: farm.totalMedicamentos, chip: 'Catálogo', color: colors.tealDeep, bg: colors.mint },
+    { icon: 'warning', label: 'Stock bajo o sin stock', value: farm.stockBajo + farm.sinStock, chip: 'Revisar', color: colors.amber, bg: colors.amberTint },
+    { icon: 'alert-circle', label: 'Lotes por caducar / vencidos', value: `${farm.lotesPorCaducar} / ${farm.lotesCaducados}`, chip: '30 días', color: colors.coral, bg: colors.coralTint },
+  ] : [
     { icon: 'people', label: 'Pacientes totales', value: stats.totalPatients, chip: 'Registrados', color: colors.tealDeep, bg: colors.mint },
     { icon: 'warning', label: 'Casos urgentes', value: stats.yellowCount, chip: 'Amarillo', color: colors.amber, bg: colors.amberTint },
     { icon: 'alert-circle', label: 'Casos críticos', value: stats.redCount, chip: 'Rojo', color: colors.coral, bg: colors.coralTint },

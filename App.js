@@ -15,6 +15,12 @@ import Externas from './src/screens/Externas';
 import Hospitals from './src/screens/Hospitals';
 import Seguimiento from './src/screens/Seguimiento';
 import Auditoria from './src/screens/Auditoria';
+import SignosVitales from './src/screens/SignosVitales';
+import Medicacion from './src/screens/Medicacion';
+import Medicamentos from './src/screens/Medicamentos';
+import Existencias from './src/screens/Existencias';
+import Movimientos from './src/screens/Movimientos';
+import AlertasFarmacia from './src/screens/AlertasFarmacia';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,11 +42,25 @@ function Routes() {
               <Stack.Screen name="Triage" component={Triage} />
               <Stack.Screen name="Patients" component={Patients} />
               <Stack.Screen name="Internas" component={Internas} />
+              <Stack.Screen name="Hospitals" component={Hospitals} />
+              <Stack.Screen name="Seguimiento" component={Seguimiento} />
             </>
           )}
           {can('medico') && <Stack.Screen name="Externas" component={Externas} />}
-          <Stack.Screen name="Hospitals" component={Hospitals} />
-          <Stack.Screen name="Seguimiento" component={Seguimiento} />
+          {can('enfermeria', 'medico') && (
+            <>
+              <Stack.Screen name="SignosVitales" component={SignosVitales} />
+              <Stack.Screen name="Medicacion" component={Medicacion} />
+            </>
+          )}
+          {can('farmacia', 'enfermeria', 'medico') && <Stack.Screen name="Existencias" component={Existencias} />}
+          {can('farmacia', 'enfermeria') && <Stack.Screen name="Movimientos" component={Movimientos} />}
+          {can('farmacia') && (
+            <>
+              <Stack.Screen name="Medicamentos" component={Medicamentos} />
+              <Stack.Screen name="AlertasFarmacia" component={AlertasFarmacia} />
+            </>
+          )}
           {can() && <Stack.Screen name="Auditoria" component={Auditoria} />}
         </>
       )}

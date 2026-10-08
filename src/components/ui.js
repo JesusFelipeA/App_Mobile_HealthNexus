@@ -85,7 +85,11 @@ export function Field({ label, icon, style, multiline, ...props }) {
 // Lista desplegable (reemplaza al <select> de la web)
 export function SelectField({ label, icon, value, options, onChange, placeholder = 'Selecciona...' }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const selected = options.find((o) => String(o.value) === String(value));
+  const searchable = options.length > 8;
+  const shown = search ? options.filter((o) => o.label.toLowerCase().includes(search.trim().toLowerCase())) : options;
+  const close = () => { setOpen(false); setSearch(''); };
   return (
     <View style={{ marginBottom: 16 }}>
       {label ? (
@@ -98,15 +102,19 @@ export function SelectField({ label, icon, value, options, onChange, placeholder
         <Text style={{ color: selected ? colors.text : colors.faint, fontSize: 15, flex: 1 }} numberOfLines={1}>{selected ? selected.label : placeholder}</Text>
         <Ico name="chevron-down" size={18} color={colors.sub} />
       </Pressable>
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <Pressable style={s.overlay} onPress={() => setOpen(false)}>
+      <Modal visible={open} transparent animationType="fade" onRequestClose={close}>
+        <Pressable style={s.overlay} onPress={close}>
           <View style={s.sheet}>
+            {searchable ? (
+              <TextInput value={search} onChangeText={setSearch} placeholder="Buscar..." placeholderTextColor={colors.faint} autoCorrect={false} style={[s.input, { margin: 12, marginBottom: 4 }]} />
+            ) : null}
             <FlatList
-              data={options}
+              keyboardShouldPersistTaps="handled"
+              data={shown}
               keyExtractor={(o) => String(o.value)}
               ListEmptyComponent={<Text style={{ padding: 20, textAlign: 'center', color: colors.sub }}>No hay opciones disponibles.</Text>}
               renderItem={({ item }) => (
-                <Pressable onPress={() => { onChange(String(item.value)); setOpen(false); }} style={s.option}>
+                <Pressable onPress={() => { onChange(String(item.value)); close(); }} style={s.option}>
                   <Text style={{ color: colors.text, fontSize: 15, fontWeight: String(item.value) === String(value) ? '800' : '500' }}>{item.label}</Text>
                 </Pressable>
               )}

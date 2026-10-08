@@ -31,3 +31,18 @@ export const reservarCama = (hospitalId, pacienteId) => http.post(`/hospitals/${
 export const getSeguimiento = () => http.get('/seguimiento');
 export const getAuditoria = (params) => http.get(`/auditoria${qs(params)}`);
 export const activarEmergencia = (mensaje) => http.post('/emergencias', { mensaje });
+
+// Farmacia
+export const getFarmaciaResumen = () => http.get('/farmacia/resumen');
+export const getMedicamentos = (params) => http.get(`/farmacia/medicamentos${qs(params)}`);
+export const getCatalogo = (q) => http.get(`/farmacia/catalogo${qs({ q })}`);
+export const getExistencias = (params) => http.get(`/farmacia/existencias${qs(params)}`);
+export const getMovimientos = (params) => http.get(`/farmacia/movimientos${qs(params)}`);
+export const createMovimiento = (data) => http.post('/farmacia/movimientos', data);
+export const getAlertasFarmacia = () => http.get('/farmacia/alertas');
+
+// Enfermería
+export const getSignos = (pacienteId) => http.get(`/enfermeria/signos${qs({ pacienteId })}`);
+export const createSignos = (data) => http.post('/enfermeria/signos', data);
+export const getAdministraciones = (pacienteId) => http.get(`/enfermeria/administraciones${qs({ pacienteId })}`);
+export const createAdministracion = (data) => http.post('/enfermeria/administraciones', data);
