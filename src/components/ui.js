@@ -3,8 +3,37 @@ import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+export { default as Paginator } from './Paginator';
 
-export const colors = { text: '#0E2430', sub: '#5D7480', faint: '#8DA0A9', teal: '#0E7C74', tealDeep: '#0A5C57', mint: '#E4F3EF', coral: '#DD5B47', coralTint: '#FBE7E2', amber: '#C98A2C', amberTint: '#FAEDDA', line: '#E3EAEA', bg: '#F5F8F8', green: '#16A34A', red: '#DC2626' };
+export const colors = {
+  // Tipografía
+  text: '#102A6A',
+  sub: '#4F5D7A',
+  faint: '#8B96B2',
+
+  // Colores principales HealthNexus
+  teal: '#6B4DE6',       // Morado principal
+  tealDeep: '#4E2CCF',   // Morado oscuro
+
+  // Fondos suaves
+  mint: '#EEE9FF',
+
+  // Azul corporativo
+  coral: '#102A6A',
+  coralTint: '#E8EEFF',
+
+  // Lavanda
+  amber: '#B39DFF',
+  amberTint: '#F4F1FF',
+
+  // Base UI
+  line: '#DDE4F0',
+  bg: '#F7F9FC',
+
+  // Estados
+  green: '#22C55E',
+  red: '#EF4444'
+};
 
 export const shadow = { shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 };
 
@@ -142,16 +171,41 @@ export function Button({ title, icon, onPress, variant = 'primary', color = colo
   );
 }
 
+
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: colors.line },
+  header: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+  paddingHorizontal: 20,
+  paddingVertical: 16,
+  backgroundColor: '#fff',
+  borderBottomWidth: 1,
+  borderBottomColor: colors.line,
+},
   back: { padding: 6, marginRight: 4 },
   headerTitle: { fontSize: 20, fontWeight: '800', color: colors.text, flexShrink: 1 },
   content: { padding: 24, paddingBottom: 120 },
-  card: { backgroundColor: '#fff', borderRadius: 20, padding: 20, marginBottom: 16, ...shadow },
+  card: {
+  backgroundColor: '#fff',
+  borderRadius: 20,
+  padding: 20,
+  marginBottom: 16,
+  borderWidth: 1,
+  borderColor: colors.line,
+  ...shadow,
+},
   badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
   badgeText: { fontSize: 11, fontWeight: '700' },
-  sectionTitle: { marginBottom: 16, fontSize: 14, fontWeight: '700', color: colors.sub, textTransform: 'uppercase', letterSpacing: 1 },
+  sectionTitle: {
+  marginBottom: 16,
+  fontSize: 14,
+  fontWeight: '700',
+  color: colors.teal,
+  textTransform: 'uppercase',
+  letterSpacing: 1,
+},
   errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.coralTint, borderRadius: 14, padding: 14, marginBottom: 16 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
   label: { fontSize: 13, fontWeight: '600', color: colors.sub },
@@ -159,7 +213,25 @@ const s = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 },
   sheet: { backgroundColor: '#fff', borderRadius: 20, maxHeight: '70%', overflow: 'hidden' },
   option: { paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: colors.line },
-  btnPrimary: { height: 55, borderRadius: 16, backgroundColor: colors.teal, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, elevation: 4 },
+  btnPrimary: {
+  height: 55,
+  borderRadius: 16,
+  backgroundColor: colors.teal,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 8,
+  elevation: 4,
+},
   btnOutline: { height: 55, borderRadius: 16, borderWidth: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  btnSoft: { marginTop: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: colors.bg, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  btnSoft: {
+  marginTop: 14,
+  paddingVertical: 12,
+  borderRadius: 12,
+  backgroundColor: colors.amberTint,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 8,
+},
 });
