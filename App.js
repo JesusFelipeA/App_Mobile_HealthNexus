@@ -10,6 +10,7 @@ import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import Triage from './src/screens/Triage';
 import Patients from './src/screens/Patients';
+import NuevoPaciente from './src/screens/NuevoPaciente';
 import Internas from './src/screens/Internas';
 import Externas from './src/screens/Externas';
 import Hospitals from './src/screens/Hospitals';
@@ -41,6 +42,7 @@ function Routes() {
             <>
               <Stack.Screen name="Triage" component={Triage} />
               <Stack.Screen name="Patients" component={Patients} />
+              <Stack.Screen name="NuevoPaciente" component={NuevoPaciente} />
               <Stack.Screen name="Internas" component={Internas} />
               <Stack.Screen name="Hospitals" component={Hospitals} />
               <Stack.Screen name="Seguimiento" component={Seguimiento} />

@@ -23,3 +23,24 @@ export async function clearToken() {
     /* no había token guardado */
   }
 }
+const DEVICE_SERVICE = 'healthnexus.device';
+
+export async function getDeviceFingerprint() {
+  const credentials = await Keychain.getGenericPassword({
+    service: DEVICE_SERVICE,
+  });
+
+  if (credentials?.password) {
+    return credentials.password;
+  }
+
+  // Es un identificador, no un secreto de autenticación.
+  const randomPart = () => Math.random().toString(36).slice(2);
+  const fingerprint = `${Date.now()}-${randomPart()}${randomPart()}${randomPart()}${randomPart()}`;
+
+  await Keychain.setGenericPassword('device', fingerprint, {
+    service: DEVICE_SERVICE,
+  });
+
+  return fingerprint;
+}

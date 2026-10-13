@@ -633,18 +633,6 @@ export default function Dashboard({ navigation }) {
               </View>
             </View>
 
-            <Pressable
-              style={s.logoutButton}
-              onPress={confirmLogout}
-            >
-              <Ico
-                name="log-out-outline"
-                size={17}
-                color="#fff"
-              />
-
-              <Text style={s.logoutText}>Cerrar sesión</Text>
-            </Pressable>
           </Animated.View>
         </Animated.View>
 
